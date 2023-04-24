@@ -16,14 +16,10 @@ import pkg_resources
 from lib.pipcompile import pipcompile
 from packaging.version import LegacyVersion, Version, parse
 
-_GITHUB_ACCESS_TOKEN = "<your-github-access-token>"
+_GITHUB_ACCESS_TOKEN = ""
 _TMP_DIRECTORY: Final = TemporaryDirectory()
-_REQUIREMENTS_INS_ORIGINAL: Final = [
-    Path("<path-to-requirements.in-1>"),
-    Path("<path-to-requirements.in-2>"),
-    Path("<path-to-requirements.in-3>"),
-]
-_REQUIREMENTS_TXT_ORIGINAL: Final = Path("<path-to-requirements.txt>")
+_REQUIREMENTS_INS_ORIGINAL: Final = [Path("./example/requirements.in")]
+_REQUIREMENTS_TXT_ORIGINAL: Final = Path("./example/requirements.txt")
 _REQUIREMENTS_INS_COPY: Final = [
     Path(_TMP_DIRECTORY.name) / input_file for input_file in _REQUIREMENTS_INS_ORIGINAL
 ]
@@ -418,13 +414,19 @@ def copy_requirements() -> None:
 
 
 if __name__ == "__main__":
+    if not _GITHUB_ACCESS_TOKEN:
+        sys.exit("Please specify your Github Access Token.")
+
     copy_requirements()
 
+    # The force=True is needed to overcome an unconditional call to logging.basicConfig() that happens when
+    # piptools.scripts.compile gets imported by lib.pipcompile.
     logging.basicConfig(
         level=logging.INFO,
         format=_LOG_FORMAT,
         datefmt="%H:%M:%S",
         stream=sys.stdout,
+        force=True,
     )
 
     asyncio.run(main())
